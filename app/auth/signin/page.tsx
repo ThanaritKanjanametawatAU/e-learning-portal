@@ -4,10 +4,15 @@ import { SignInPage } from '@toolpad/core/SignInPage';
 import { AuthError } from 'next-auth';
 import { providerMap, signIn } from '../../../auth';
 
+const githubProvider: AuthProvider = {
+  id: 'github',
+  name: 'GitHub'
+};
+
 export default function SignIn() {
   return (
     <SignInPage
-      providers={providerMap}
+      providers={[githubProvider]}
       signIn={async (provider: AuthProvider, formData: FormData, callbackUrl?: string) => {
         'use server';
         try {
