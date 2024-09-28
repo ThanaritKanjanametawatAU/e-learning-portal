@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
-import dbConnect from '../../lib/db';
-import { Course, User } from '../../models';
+import dbConnect from '@/lib/db';
+import { Course, User } from '@/models';
 
 async function getUserData(userId: string) {
   await dbConnect();

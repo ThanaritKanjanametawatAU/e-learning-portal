@@ -1,3 +1,5 @@
+import React from 'react';
+
 export default function LearningPage({ params }: { params: { courseId: string } }) {
   return (
     <div>

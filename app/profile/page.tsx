@@ -1,6 +1,6 @@
 import React from 'react';
-import dbConnect from '../../lib/db';
-import { User } from '../../models';
+import dbConnect from '@/lib/db';
+import { User } from '@/models';
 
 async function getUserProfile(userId: string) {
   await dbConnect();

@@ -3,21 +3,9 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import Footer from './Footer';
-
-function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
-  const pathname = usePathname();
-  const isActive = pathname === href;
-  return (
-    <Link href={href} className={`${isActive ? 'font-bold' : ''} hover:underline`}>
-      {children}
-    </Link>
-  );
-}
-
-function ToggleIcon({ isTeacher, onClick }: { isTeacher: boolean; onClick: () => void }) {
-  // ... (keep the existing ToggleIcon component)
-}
+import Footer from '../Footer';
+import NavLink from '../NavLink';
+import ToggleIcon from '../ToggleIcon';
 
 export default function ClientLayout({
   children,

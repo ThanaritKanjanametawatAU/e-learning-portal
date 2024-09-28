@@ -1,0 +1,105 @@
+E-Learning Portal Project Description
+The E-Learning Portal is a web application built with Next.js and MongoDB, designed to facilitate online learning through a dual-role system. Key features include:
+
+Dual User Roles: Users can switch between Teacher and Student views.
+Course Management:
+
+Teachers can create, edit, and manage courses and lessons.
+Students can browse, enroll in, and take courses.
+
+
+Progress Tracking:
+
+Students can track their progress in enrolled courses.
+Teachers can monitor student enrollment and progress.
+
+
+No Authentication: This demo version operates without login or registration systems.
+Technology Stack:
+
+Frontend: Next.js
+Backend: Next.js API routes (REST API)
+Database: MongoDB (free M0 cluster)
+ORM: Mongoose for data modeling
+
+
+Core Functionality:
+
+Course creation and editing
+Course enrollment
+Lesson completion tracking
+User profile management
+
+
+
+This project serves as a basic demonstration of an e-learning platform, focusing on core educational features without complex user management systems.
+
+
+
+
+
+
+
+# E-Learning Portal Page Scaffold
+
+## 1. Home Page (T, S)
+- Brief introduction to the platform
+- Quick access to Course Catalog
+- Switch between Teacher and Student views
+
+## 2. Course Catalog (T, S)
+- List of all available courses
+- Search and filter functionality
+- "Create New Course" button (visible only in Teacher view)
+
+## 3. Course Detail (T, S)
+- Course title, description, and teacher information
+- List of lessons
+- "Enroll" button (for Students)
+- "Edit Course" button (for course creator in Teacher view)
+
+## 4. User Profile and Settings (T, S)
+- User information (name, email)
+- Option to update profile
+- Toggle between Teacher and Student views
+
+## 5. User's Concerning Courses
+### Teacher View: Created Courses
+- List of courses created by the teacher
+- "Create New Course" button
+- Edit and delete options for each course
+
+### Student View: Enrolled Courses
+- List of courses the student is enrolled in
+- Progress indicator for each course
+- "Continue Learning" button for each course
+
+## 6. Course Editor (T)
+- Form to create/edit course details (title, description)
+- Add, edit, or remove lessons
+- Save and publish options
+
+## 7. Course Learning Page (S)
+- Course title and overall progress
+- List of lessons with completion status
+- Current lesson content
+- Navigation between lessons
+- Quiz or assessment components (if applicable)
+
+## 8. Dashboard (T, S)
+- Overview of user's activity
+- Quick access to created/enrolled courses
+- Recent progress for students
+- Recent course activity for teachers
+
+## API Routes (tentative)
+- `/api/users`: CRUD operations for users
+- `/api/teachers`: CRUD operations for teachers
+- `/api/students`: CRUD operations for students
+- `/api/courses`: CRUD operations for courses
+- `/api/enroll`: Endpoint for students to enroll in courses
+- `/api/progress`: Update and retrieve student progress in courses
+- `/api/lessons`: CRUD operations for lessons within courses
+
+
+

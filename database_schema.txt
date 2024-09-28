@@ -1,0 +1,62 @@
+MongoDB Database Schema
+
+1. User Collection
+   - _id: ObjectId (auto-generated)
+   - name: String (required)
+   - email: String (required, unique)
+   - teacherId: ObjectId (foreign key to Teacher collection)
+   - studentId: ObjectId (foreign key to Student collection)
+   - createdAt: Date
+   - updatedAt: Date
+
+2. Teacher Collection
+   - _id: ObjectId (auto-generated)
+   - userId: ObjectId (required, foreign key to User collection)
+   - bio: String
+   - createdCourses: [ObjectId] (array of foreign keys to Course collection)
+   - createdAt: Date
+   - updatedAt: Date
+
+3. Student Collection
+   - _id: ObjectId (auto-generated)
+   - userId: ObjectId (required, foreign key to User collection)
+   - enrolledCourses: [
+       {
+         courseId: ObjectId (foreign key to Course collection)
+         progress: Number
+         enrollmentDate: Date
+       }
+     ]
+   - createdAt: Date
+   - updatedAt: Date
+
+4. Course Collection
+   - _id: ObjectId (auto-generated)
+   - title: String (required)
+   - description: String (required)
+   - teacherId: ObjectId (required, foreign key to Teacher collection)
+   - lessons: [ObjectId] (array of foreign keys to Lesson collection)
+   - enrolledStudents: [ObjectId] (array of foreign keys to Student collection)
+   - createdAt: Date
+   - updatedAt: Date
+
+5. Lesson Collection
+   - _id: ObjectId (auto-generated)
+   - title: String (required)
+   - content: String (required)
+   - order: Number (required)
+   - courseId: ObjectId (required, foreign key to Course collection)
+   - createdAt: Date
+   - updatedAt: Date
+
+Foreign Key Relationships:
+- User -> Teacher: User.teacherId references Teacher._id
+- User -> Student: User.studentId references Student._id
+- Teacher -> User: Teacher.userId references User._id
+- Teacher -> Course: Teacher.createdCourses references Course._id
+- Student -> User: Student.userId references User._id
+- Student -> Course: Student.enrolledCourses.courseId references Course._id
+- Course -> Teacher: Course.teacherId references Teacher._id
+- Course -> Lesson: Course.lessons references Lesson._id
+- Course -> Student: Course.enrolledStudents references Student._id
+- Lesson -> Course: Lesson.courseId references Course._id

@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import "./globals.css";
-import ClientLayout from './components/ClientLayout';
+import ClientLayout from '@/components/layouts/ClientLayout';
 
 export const metadata: Metadata = {
   title: "E-Learning Portal",
