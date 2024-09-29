@@ -1,22 +1,39 @@
-import React from 'react';
-import CourseList from '@/components/CourseList';
-import SearchBar from '@/components/SearchBar';
+'use client';
 
-// This is a mock function. In a real application, you would fetch this data from an API.
-const getMockCourses = () => [
-  { _id: '1', title: 'Introduction to React', description: 'Learn the basics of React' },
-  { _id: '2', title: 'Advanced TypeScript', description: 'Master TypeScript for large-scale applications' },
-  { _id: '3', title: 'Next.js Fundamentals', description: 'Build server-side rendered React applications' },
-];
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function BrowseCoursesPage() {
-  const courses = getMockCourses();
+  const { user, isTeacher } = useAuth();
 
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Browse All Courses</h1>
-      <SearchBar />
-      <CourseList courses={courses} />
-    </div>
-  );
+  if (!user) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <h1 className="text-2xl font-bold mb-4">Please log in to view courses</h1>
+        <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+          Log In
+        </button>
+      </div>
+    );
+  }
+
+  if (isTeacher) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6">Teacher View: All Courses</h1>
+        <p className="mb-4">Welcome, {user.name}! Here you can manage your courses.</p>
+        <button className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+          Create New Course
+        </button>
+        {/* Add more teacher-specific content here */}
+      </div>
+    );
+  } else {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6">Student View: Browse All Courses</h1>
+        <p className="mb-4">Welcome, {user.name}! Here you can browse and enroll in courses.</p>
+        {/* Add course browsing and enrollment functionality for students */}
+      </div>
+    );
+  }
 }

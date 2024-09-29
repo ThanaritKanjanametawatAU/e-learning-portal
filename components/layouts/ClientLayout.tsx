@@ -22,18 +22,16 @@ export default function ClientLayout({
             <NavLink href="/">Home</NavLink>
             {user ? (
               <>
-                <NavLink href="/browse-courses">Browse All Courses</NavLink>
-                <NavLink href="/my-courses">My Courses</NavLink>
+                <NavLink href="/browse-all-courses">Browse All Courses</NavLink>
+                <NavLink href="/browse-courses">My Courses</NavLink>
                 <NavLink href="/profile">Profile</NavLink>
-                <NavLink href="/dashboard">Dashboard</NavLink>
                 <span className="ml-4 font-semibold">
                   {isTeacher ? "Teacher's View" : "Student's View"}
                 </span>
               </>
             ) : (
               <>
-                <NavLink href="/login">Login</NavLink>
-                <NavLink href="/register">Register</NavLink>
+
               </>
             )}
           </div>

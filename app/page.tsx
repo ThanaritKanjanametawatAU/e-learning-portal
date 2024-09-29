@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import RegistrationForm from '@/components/RegistrationForm';
 import LoginForm from '@/components/LoginForm';
@@ -11,6 +11,8 @@ import { useAuth } from '@/contexts/AuthContext';
 export default function Home() {
   const { user, isTeacher, login, logout } = useAuth();
   const router = useRouter();
+  const [showRoleSelection, setShowRoleSelection] = useState(false);
+  const [tempUserId, setTempUserId] = useState<string | null>(null);
 
   const handleLogin = async (email: string, password: string) => {
     try {
@@ -21,7 +23,6 @@ export default function Home() {
       });
       if (response.ok) {
         const userData = await response.json();
-        // Ensure that teacherId and studentId are included in the response
         login({
           id: userData.id,
           name: userData.name,
@@ -46,13 +47,38 @@ export default function Home() {
       });
       if (response.ok) {
         const userData = await response.json();
-        login(userData);
+        setShowRoleSelection(true);
+        setTempUserId(userData.id);
       } else {
         throw new Error('Registration failed');
       }
     } catch (error) {
       console.error('Registration error:', error);
       // Handle error (e.g., show error message to user)
+    }
+  };
+
+  const handleRoleSelection = async (role: 'teacher' | 'student') => {
+    try {
+      if (!tempUserId) {
+        throw new Error('User ID is missing');
+      }
+      const response = await fetch('/api/select-role', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: tempUserId, role }),
+      });
+      if (response.ok) {
+        const userData = await response.json();
+        login(userData);
+        setShowRoleSelection(false);
+        setTempUserId(null);
+      } else {
+        throw new Error('Role selection failed');
+      }
+    } catch (error) {
+      console.error('Role selection error:', error);
+      // Handle error
     }
   };
 
@@ -79,16 +105,26 @@ export default function Home() {
         ) : (
           <>
             <p className="mb-6 text-center text-gray-600">Start your learning journey today or share your knowledge with others!</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div>
-                <h2 className="text-2xl font-semibold mb-4 text-center">Register</h2>
-                <RegistrationForm onRegister={handleRegister} />
+            {showRoleSelection ? (
+              <div className="text-center">
+                <h2 className="text-2xl font-semibold mb-4">Choose your role</h2>
+                <div className="space-x-4">
+                  <Button onClick={() => handleRoleSelection('teacher')}>I'm a Teacher</Button>
+                  <Button onClick={() => handleRoleSelection('student')}>I'm a Student</Button>
+                </div>
               </div>
-              <div>
-                <h2 className="text-2xl font-semibold mb-4 text-center">Login</h2>
-                <LoginForm onLogin={handleLogin} />
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <h2 className="text-2xl font-semibold mb-4 text-center">Register</h2>
+                  <RegistrationForm onRegister={handleRegister} />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-semibold mb-4 text-center">Login</h2>
+                  <LoginForm onLogin={handleLogin} />
+                </div>
               </div>
-            </div>
+            )}
           </>
         )}
       </div>
