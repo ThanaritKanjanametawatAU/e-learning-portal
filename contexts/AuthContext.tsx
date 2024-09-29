@@ -38,10 +38,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsTeacher(!!user.teacherId);
   }
 
-  function logout() {
+  const logout = async () => {
+    // Implement your logout logic here
+    // This might involve clearing tokens, resetting state, etc.
     setUser(null);
     setIsTeacher(false);
-  }
+    // Any other necessary cleanup
+  };
 
   function toggleTeacherRole() {
     setIsTeacher((prevIsTeacher) => !prevIsTeacher);
