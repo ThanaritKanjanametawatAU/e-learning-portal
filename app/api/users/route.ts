@@ -36,12 +36,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Email already in use' }, { status: 409 });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
+    // Do not hash the password 
     const newUser = new User({
       name,
       email,
-      password: hashedPassword,
+      password,
       roles,
     });
 

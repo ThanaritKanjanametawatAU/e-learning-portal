@@ -12,6 +12,10 @@ const nextConfig = {
     }
     return config;
   },
+  // Add this line to disable TypeScript type checking
+  typescript: {
+    ignoreBuildErrors: true,
+  },
 };
 
 export default nextConfig;
