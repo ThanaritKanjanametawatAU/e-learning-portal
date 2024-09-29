@@ -17,30 +17,28 @@ export default function Home() {
     const storedRole = localStorage.getItem('role');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
+      checkUserRole(JSON.parse(storedUser).id);
     }
     if (storedRole) {
       setRole(storedRole as 'student' | 'teacher');
     }
   }, []);
 
-  const handleRegister = async (name: string, email: string, password: string) => {
+  const checkUserRole = async (userId: string) => {
     try {
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password }),
-      });
+      const response = await fetch(`/api/users/${userId}`);
       if (response.ok) {
         const userData = await response.json();
-        const newUser = { name: userData.name, id: userData.id };
-        setUser(newUser);
-        localStorage.setItem('user', JSON.stringify(newUser));
-      } else {
-        throw new Error('Registration failed');
+        if (userData.studentId) {
+          setRole('student');
+          localStorage.setItem('role', 'student');
+        } else if (userData.teacherId) {
+          setRole('teacher');
+          localStorage.setItem('role', 'teacher');
+        }
       }
     } catch (error) {
-      console.error('Registration error:', error);
-      // Handle error (e.g., show error message to user)
+      console.error('Error checking user role:', error);
     }
   };
 
@@ -56,11 +54,36 @@ export default function Home() {
         const loggedInUser = { name: userData.name, id: userData.id };
         setUser(loggedInUser);
         localStorage.setItem('user', JSON.stringify(loggedInUser));
+        
+        // Check user role immediately after login
+        await checkUserRole(userData.id);
       } else {
         throw new Error('Login failed');
       }
     } catch (error) {
       console.error('Login error:', error);
+      // Handle error (e.g., show error message to user)
+    }
+  };
+
+  const handleRegister = async (name: string, email: string, password: string) => {
+    try {
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password }),
+      });
+      if (response.ok) {
+        const userData = await response.json();
+        const newUser = { name: userData.name, id: userData.id };
+        setUser(newUser);
+        localStorage.setItem('user', JSON.stringify(newUser));
+        // Don't set role here, let the user choose after registration
+      } else {
+        throw new Error('Registration failed');
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
       // Handle error (e.g., show error message to user)
     }
   };
@@ -73,8 +96,6 @@ export default function Home() {
   };
 
   const handleRoleSelection = async (selectedRole: 'student' | 'teacher') => {
-    setRole(selectedRole);
-
     if (!user) {
       console.error('User is not available');
       return;
@@ -91,6 +112,8 @@ export default function Home() {
 
       if (userData.studentId || userData.teacherId) {
         console.log(`User is already a ${userData.studentId ? 'student' : 'teacher'}`);
+        setRole(userData.studentId ? 'student' : 'teacher');
+        localStorage.setItem('role', userData.studentId ? 'student' : 'teacher');
         return;
       }
 
