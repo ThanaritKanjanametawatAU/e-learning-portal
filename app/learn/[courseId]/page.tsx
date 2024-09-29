@@ -1,14 +1,37 @@
-import React from 'react';
+"use client";
+
+import { useEffect, useState } from 'react';
+import { getCourseDetails } from '@/services/courseService';
+
+interface Course {
+  title: string;
+  description: string;
+  course_content: string;
+}
 
 export default function LearningPage({ params }: { params: { courseId: string } }) {
+  const [course, setCourse] = useState<Course | null>(null);
+
+  useEffect(() => {
+    async function fetchCourseDetails() {
+      const courseData = await getCourseDetails(params.courseId);
+      setCourse(courseData);
+    }
+    fetchCourseDetails();
+  }, [params.courseId]);
+
+  if (!course) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <div>
-      <h1>Course Title</h1>
-      <p>Progress: 50%</p>
-      <h2>Current Lesson: Lesson Title</h2>
-      {/* Lesson content would go here */}
-      <button>Previous Lesson</button>
-      <button>Next Lesson</button>
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-2">{course.title}</h1>
+      <p className="text-lg mb-4">{course.description}</p>
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold mb-2">Course Content</h2>
+        <p>{course.course_content}</p>
+      </div>
     </div>
   );
 }

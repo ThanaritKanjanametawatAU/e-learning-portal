@@ -25,7 +25,6 @@ export default function ClientLayout({
             {user ? (
               <>
                 <NavLink href="/browse-all-courses">Browse All Courses</NavLink>
-                <NavLink href="/browse-courses">My Courses</NavLink>
                 <NavLink href="/profile">Profile</NavLink>
                 <span className="ml-4 font-semibold">
                   {isTeacher ? "Teacher's View" : "Student's View"}

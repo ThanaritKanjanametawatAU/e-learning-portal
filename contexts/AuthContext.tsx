@@ -1,7 +1,7 @@
 'use client';
 
 import dbConnect from '@/lib/db';
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 interface User {
   id: string;
@@ -15,11 +15,12 @@ interface AuthContextType {
   isTeacher: boolean;
   login: (user: User) => void;
   logout: () => void;
+  toggleTeacherRole: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isTeacher, setIsTeacher] = useState<boolean>(false);
 
@@ -32,20 +33,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const login = (userData: User) => {
-    setUser(userData);
-    setIsTeacher(userData.teacherId !== null); // Check for null instead of undefined
-    localStorage.setItem('user', JSON.stringify(userData));
-  };
+  function login(user: User) {
+    setUser(user);
+    setIsTeacher(!!user.teacherId);
+  }
 
-  const logout = () => {
+  function logout() {
     setUser(null);
     setIsTeacher(false);
-    localStorage.removeItem('user');
-  };
+  }
+
+  function toggleTeacherRole() {
+    setIsTeacher((prevIsTeacher) => !prevIsTeacher);
+  }
 
   return (
-    <AuthContext.Provider value={{ user, isTeacher, login, logout }}>
+    <AuthContext.Provider value={{ user, isTeacher, login, logout, toggleTeacherRole }}>
       {children}
     </AuthContext.Provider>
   );

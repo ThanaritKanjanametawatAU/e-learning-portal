@@ -34,6 +34,7 @@ MongoDB Database Schema
    - _id: ObjectId (auto-generated)
    - title: String (required)
    - description: String (required)
+   - course_content: String // New field for course content
    - teacherId: ObjectId (required, foreign key to Teacher collection)
    - lessons: [ObjectId] (array of foreign keys to Lesson collection)
    - enrolledStudents: [ObjectId] (array of foreign keys to Student collection)

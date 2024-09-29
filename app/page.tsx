@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function Home() {
-  const { user, isTeacher, login, logout } = useAuth();
+  const { user, isTeacher, login, logout, toggleTeacherRole } = useAuth();
   const router = useRouter();
   const [showRoleSelection, setShowRoleSelection] = useState(false);
   const [tempUserId, setTempUserId] = useState<string | null>(null);
@@ -71,6 +71,21 @@ export default function Home() {
       if (response.ok) {
         const userData = await response.json();
         login(userData);
+
+        // Additional PATCH request to update userId with the newly created teacherId or studentId
+        const patchResponse = await fetch(`/api/users/${tempUserId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            teacherId: role === 'teacher' ? userData.teacherId : null,
+            studentId: role === 'student' ? userData.studentId : null,
+          }),
+        });
+
+        if (!patchResponse.ok) {
+          throw new Error('Failed to update user role');
+        }
+
         setShowRoleSelection(false);
         setTempUserId(null);
       } else {
@@ -89,7 +104,7 @@ export default function Home() {
         
         {user ? (
           <div className="text-center">
-            <p className="text-2xl mb-6">Hello, {user.name}!</p>
+            <p className="text-2xl mb-6 text-black">Hello, {user.name}!</p>
             <div className="space-x-4">
               <Link href="/courses" className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded">
                 Explore Courses
@@ -99,6 +114,12 @@ export default function Home() {
                 variant="destructive"
               >
                 Logout
+              </Button>
+              <Button
+                onClick={toggleTeacherRole}
+                variant="primary"
+              >
+                {isTeacher ? 'Switch to Student View' : 'Switch to Teacher View'}
               </Button>
             </div>
           </div>
@@ -116,11 +137,11 @@ export default function Home() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
-                  <h2 className="text-2xl font-semibold mb-4 text-center">Register</h2>
+                  <h2 className="text-2xl font-semibold mb-4 text-center text-black">Register</h2>
                   <RegistrationForm onRegister={handleRegister} />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-semibold mb-4 text-center">Login</h2>
+                  <h2 className="text-2xl font-semibold mb-4 text-center text-black">Login</h2>
                   <LoginForm onLogin={handleLogin} />
                 </div>
               </div>
