@@ -1,21 +1,37 @@
-import React from 'react';
-import Link from 'next/link';
-import dbConnect from '@/lib/db';
-import { Course, User } from '@/models';
+'use client';
 
-async function getUserData(userId: string) {
-  await dbConnect();
-  const user = await User.findById(userId).lean();
-  const courses = await Course.find({ teacherId: user.teacherId }).lean();
-  return { user, courses };
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
+
+interface Course {
+  _id: string;
+  title: string;
+  description: string;
 }
 
-export default async function Dashboard() {
-  // In a real app, you'd get the user ID from the session
-  const userId = 'dummy-user-id';
-  const { user, courses } = await getUserData(userId);
+export default function Dashboard() {
+  const { user, isTeacher } = useAuth();
+  const [courses, setCourses] = useState<Course[]>([]);
 
-  const isTeacher = !!user.teacherId;
+  useEffect(() => {
+    const fetchCourses = async () => {
+      if (!user) return;
+      
+      const endpoint = isTeacher ? '/api/courses/created' : '/api/courses/enrolled';
+      const response = await fetch(`${endpoint}?userId=${user.id}`);
+      if (response.ok) {
+        const data = await response.json();
+        setCourses(data);
+      }
+    };
+
+    fetchCourses();
+  }, [user, isTeacher]);
+
+  if (!user) {
+    return <div>Please log in to view your dashboard.</div>;
+  }
 
   return (
     <div>
@@ -26,12 +42,12 @@ export default async function Dashboard() {
         </Link>
       )}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-        {courses.map((course: any) => (
-          <div key={course._id.toString()} className="border rounded p-4">
+        {courses.map((course) => (
+          <div key={course._id} className="border rounded p-4">
             <h2 className="text-xl font-bold mb-2">{course.title}</h2>
             <p className="mb-4">{course.description}</p>
             <Link href={`/courses/${course._id}`} className="text-blue-500 hover:underline">
-              View Course
+              {isTeacher ? "Edit Course" : "View Course"}
             </Link>
           </div>
         ))}

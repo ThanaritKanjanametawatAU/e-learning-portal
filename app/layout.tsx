@@ -1,7 +1,10 @@
-import React from 'react';
-import type { Metadata } from 'next';
-import "./globals.css";
 import ClientLayout from '@/components/layouts/ClientLayout';
+import { AuthProvider } from '@/contexts/AuthContext';
+import './globals.css';
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: "E-Learning Portal",
@@ -15,12 +18,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="flex flex-col min-h-screen">
-        <ClientLayout>
-          <main className="flex-grow">
+      <body className={inter.className}>
+        <AuthProvider>
+          <ClientLayout>
             {children}
-          </main>
-        </ClientLayout>
+          </ClientLayout>
+        </AuthProvider>
       </body>
     </html>
   );
