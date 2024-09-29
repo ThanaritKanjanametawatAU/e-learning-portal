@@ -30,3 +30,7 @@ export async function getCourseDetails(courseId: string) {
   const response = await axios.get(`/api/courses/${courseId}`);
   return response.data;
 }
+
+export async function deleteCourse(courseId: string) {
+  await axios.delete(`/api/courses/${courseId}`);
+}

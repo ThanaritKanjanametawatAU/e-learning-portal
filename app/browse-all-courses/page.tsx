@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useState, useEffect } from 'react';
-import { fetchCourses } from '@/services/courseService';
+import { fetchCourses, deleteCourse } from '@/services/courseService';
 import { useRouter } from 'next/navigation';
 
 export default function BrowseAllCoursesPage() {
@@ -17,6 +17,11 @@ export default function BrowseAllCoursesPage() {
     }
     loadCourses();
   }, []);
+
+  async function handleDelete(courseId: string) {
+    await deleteCourse(courseId);
+    setCourses(courses.filter(course => course._id !== courseId));
+  }
 
   if (!user) {
     return (
@@ -47,12 +52,20 @@ export default function BrowseAllCoursesPage() {
             <h2 className="text-xl font-bold">{course.title}</h2>
             <p>{course.description}</p>
             {isTeacher ? (
-              <button
-                className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
-                onClick={() => router.push(`/courses/edit/${course._id}`)}
-              >
-                Edit Course
-              </button>
+              <div className="flex space-x-2">
+                <button
+                  className="mt-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                  onClick={() => router.push(`/courses/edit/${course._id}`)}
+                >
+                  Edit Course
+                </button>
+                <button
+                  className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                  onClick={() => handleDelete(course._id)}
+                >
+                  Delete Course
+                </button>
+              </div>
             ) : (
               <button
                 className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
