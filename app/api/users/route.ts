@@ -1,13 +1,13 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
-import User from '@/models/User.js';  // Update this line
+import User from '@/models/User';
 import bcrypt from 'bcryptjs';
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     await dbConnect();
     const users = await User.find({});
-    console.log('Users found:', users); // Add this line for debugging
+    console.log('Users found:', users);
     
     if (users.length === 0) {
       return NextResponse.json({ message: 'No users found' }, { status: 404 });
@@ -20,40 +20,34 @@ export async function GET(request: Request) {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    console.log('Received registration data:', body); // Log the full body including password
-
     await dbConnect();
-    console.log('Database connected');
 
-    // Check if user with the same email already exists
-    const existingUser = await User.findOne({ email: body.email });
-    if (existingUser) {
-      return NextResponse.json({ error: 'Email already in use' }, { status: 400 });
+    const { name, email, password, roles } = body;
+
+    if (!name || !email || !password || !roles) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Create user object with all required fields
-    const userObject = {
-      name: body.name,
-      email: body.email,
-      password: body.password, // Store password as plain text
-      roles: body.roles
-    };
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return NextResponse.json({ error: 'Email already in use' }, { status: 409 });
+    }
 
-    console.log('Creating user with data:', userObject); // Log the full user object
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await User.create(userObject);
+    const newUser = new User({
+      name,
+      email,
+      password: hashedPassword,
+      roles,
+    });
 
-    console.log('User created:', JSON.stringify(user.toObject(), null, 2)); // Log the full user object
+    await newUser.save();
 
-    // Add this line to log the actual saved document
-    const savedUser = await User.findById(user._id);
-    console.log('Saved user document:', savedUser ? JSON.stringify(savedUser.toObject(), null, 2) : 'User not found');
-
-    // Don't send the password back in the response
-    const { password, ...userWithoutPassword } = user.toObject();
+    const { password: _, ...userWithoutPassword } = newUser.toObject();
     return NextResponse.json(userWithoutPassword, { status: 201 });
   } catch (error: unknown) {
     console.error('Error creating user:', error);
@@ -64,7 +58,7 @@ export async function POST(request: Request) {
   }
 }
 
-export async function PUT(request: Request) {
+export async function PUT(request: NextRequest) {
   const body = await request.json();
   if (!body._id) {
     return NextResponse.json({ error: 'ID is required for PUT request' }, { status: 400 });
@@ -77,7 +71,7 @@ export async function PUT(request: Request) {
   return NextResponse.json(user);
 }
 
-export async function PATCH(request: Request) {
+export async function PATCH(request: NextRequest) {
   const body = await request.json();
   if (!body._id) {
     return NextResponse.json({ error: 'ID is required for PATCH request' }, { status: 400 });
