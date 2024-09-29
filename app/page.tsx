@@ -109,8 +109,8 @@ export default function Home() {
               <div className="text-center">
                 <h2 className="text-2xl font-semibold mb-4">Choose your role</h2>
                 <div className="space-x-4">
-                  <Button onClick={() => handleRoleSelection('teacher')}>I'm a Teacher</Button>
-                  <Button onClick={() => handleRoleSelection('student')}>I'm a Student</Button>
+                  <Button onClick={() => handleRoleSelection('teacher')}>I&apos;m a Teacher</Button>
+                  <Button onClick={() => handleRoleSelection('student')}>I&apos;m a Student</Button>
                 </div>
               </div>
             ) : (
