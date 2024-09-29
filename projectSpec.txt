@@ -1,7 +1,6 @@
 E-Learning Portal Project Description
 The E-Learning Portal is a web application built with Next.js and MongoDB, designed to facilitate online learning through a dual-role system. Key features include:
 
-Dual User Roles: Users can switch between Teacher and Student views.
 Course Management:
 
 Teachers can create, edit, and manage courses and lessons.
@@ -14,7 +13,7 @@ Students can track their progress in enrolled courses.
 Teachers can monitor student enrollment and progress.
 
 
-No Authentication: This demo version operates without login or registration systems.
+
 Technology Stack:
 
 Frontend: Next.js

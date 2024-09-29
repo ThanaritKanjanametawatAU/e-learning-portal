@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
+import { Button } from '@/components/Button';
 
-export default function LoginForm({ onLogin }: { onLogin: (username: string) => void }) {
+interface LoginFormProps {
+  onLogin: (email: string, password: string) => void;
+}
+
+export default function LoginForm({ onLogin }: LoginFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -9,18 +14,7 @@ export default function LoginForm({ onLogin }: { onLogin: (username: string) => 
     e.preventDefault();
     setError('');
     try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        onLogin(data.name);
-      } else {
-        setError(data.error || 'Login failed');
-        console.error('Login error details:', data.details);
-      }
+      onLogin(email, password);
     } catch (error) {
       console.error('Error during login:', error);
       setError('An unexpected error occurred. Please try again.');
@@ -46,9 +40,9 @@ export default function LoginForm({ onLogin }: { onLogin: (username: string) => 
         className="w-full p-2 border rounded text-gray-800 text-lg"
         required
       />
-      <button type="submit" className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded text-lg">
+      <Button type="submit" className="w-full">
         Login
-      </button>
+      </Button>
     </form>
   );
 }

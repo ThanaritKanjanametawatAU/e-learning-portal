@@ -6,7 +6,8 @@ const StudentSchema = new mongoose.Schema({
     courseId: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
     progress: { type: Number, default: 0 },
     enrollmentDate: { type: Date, default: Date.now }
-  }]
-}, { timestamps: true });
+  }],
+  createdAt: { type: Date, default: Date.now }
+});
 
 export default mongoose.models.Student || mongoose.model('Student', StudentSchema);

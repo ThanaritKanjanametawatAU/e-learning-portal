@@ -1,22 +1,28 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import Student from '@/models/Student';
-
-export async function GET() {
-  await dbConnect();
-  return NextResponse.json(await Student.find());
-}
+import { ObjectId } from 'mongodb';
 
 export async function POST(request: Request) {
   try {
     await dbConnect();
-    const body = await request.json();
-    const student = new Student(body);
-    await student.save();
-    console.log('Student created:', student._id);
-    return NextResponse.json(student, { status: 201 });
+
+    const { userId, enrolledCourses } = await request.json();
+
+    const student = new Student({
+      userId: new ObjectId(userId), // Convert string to ObjectId
+      enrolledCourses: enrolledCourses.map((course: any) => ({
+        ...course,
+        courseId: new ObjectId(course.courseId) // Convert courseId to ObjectId
+      })),
+      createdAt: new Date()
+    });
+
+    const savedStudent = await student.save();
+
+    return NextResponse.json({ id: savedStudent._id }, { status: 201 });
   } catch (error) {
-    console.error('Student creation error:', error);
-    return NextResponse.json({ message: 'An error occurred while creating the student record' }, { status: 500 });
+    console.error('Error creating student:', error);
+    return NextResponse.json({ error: 'Failed to create student' }, { status: 500 });
   }
 }

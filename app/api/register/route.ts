@@ -1,32 +1,26 @@
 import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
+import dbConnect from "@/lib/db";
+import User from "@/models/User";
+import { ObjectId } from "mongodb";
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const { email, name, password } = await req.json();
+    await dbConnect();
 
-    const existingUser = await db.user.findUnique({
-      where: {
-        email
-      }
+    const { name, email, password } = await request.json();
+
+    const user = new User({
+      _id: new ObjectId(),
+      name,
+      email,
+      password, // In a real app, you should hash the password
     });
 
-    if (existingUser) {
-      return new NextResponse("Email already in use", { status: 400 });
-    }
+    const savedUser = await user.save();
 
-    // Create user with plain text password
-    const user = await db.user.create({
-      data: {
-        name,
-        email,
-        password // Storing password as plain text
-      }
-    });
-
-    return NextResponse.json(user);
+    return NextResponse.json({ id: savedUser._id, name: savedUser.name }, { status: 201 });
   } catch (error) {
-    console.log("[REGISTER]", error);
-    return new NextResponse("Internal Error", { status: 500 });
+    console.error('Error creating user:', error);
+    return NextResponse.json({ error: 'Failed to create user' }, { status: 500 });
   }
 }

@@ -4,31 +4,138 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import RegistrationForm from '@/components/RegistrationForm';
 import LoginForm from '@/components/LoginForm';
+import { Button } from '@/components/Button';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
-  const [username, setUsername] = useState('');
+  const [user, setUser] = useState<{ name: string; id: string } | null>(null);
+  const [role, setRole] = useState<'student' | 'teacher' | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    // Check local storage for user credentials on component mount
-    const storedUsername = localStorage.getItem('username');
-    if (storedUsername) {
-      setUsername(storedUsername);
+    const storedUser = localStorage.getItem('user');
+    const storedRole = localStorage.getItem('role');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+    if (storedRole) {
+      setRole(storedRole as 'student' | 'teacher');
     }
   }, []);
 
-  const handleRegister = (name: string) => {
-    setUsername(name);
-    localStorage.setItem('username', name);
+  const handleRegister = async (name: string, email: string, password: string) => {
+    try {
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password }),
+      });
+      if (response.ok) {
+        const userData = await response.json();
+        const newUser = { name: userData.name, id: userData.id };
+        setUser(newUser);
+        localStorage.setItem('user', JSON.stringify(newUser));
+      } else {
+        throw new Error('Registration failed');
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      // Handle error (e.g., show error message to user)
+    }
   };
 
-  const handleLogin = (name: string) => {
-    setUsername(name);
-    localStorage.setItem('username', name);
+  const handleLogin = async (email: string, password: string) => {
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      if (response.ok) {
+        const userData = await response.json();
+        const loggedInUser = { name: userData.name, id: userData.id };
+        setUser(loggedInUser);
+        localStorage.setItem('user', JSON.stringify(loggedInUser));
+      } else {
+        throw new Error('Login failed');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      // Handle error (e.g., show error message to user)
+    }
   };
 
   const handleLogout = () => {
-    setUsername('');
-    localStorage.removeItem('username');
+    setUser(null);
+    setRole(null);
+    localStorage.removeItem('user');
+    localStorage.removeItem('role');
+  };
+
+  const handleRoleSelection = async (selectedRole: 'student' | 'teacher') => {
+    setRole(selectedRole);
+
+    if (!user) {
+      console.error('User is not available');
+      return;
+    }
+
+    try {
+      // Check if user already has a role
+      const userID = user.id;
+      const userResponse = await fetch(`/api/users/${userID}`);
+      if (!userResponse.ok) {
+        throw new Error('Failed to fetch user data');
+      }
+      const userData = await userResponse.json();
+
+      if (userData.studentId || userData.teacherId) {
+        console.log(`User is already a ${userData.studentId ? 'student' : 'teacher'}`);
+        return;
+      }
+
+      let roleEndpoint: string;
+
+      if (selectedRole === 'student') {
+        roleEndpoint = '/api/students';
+        const studentResponse = await fetch(roleEndpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: userID,
+            enrolledCourses: [{
+              courseId: "66f7f6ccb2ebcfd57d78508a",
+              progress: 0,
+              enrollmentDate: new Date().toISOString()
+            }]
+          })
+        });
+
+        if (!studentResponse.ok) {
+          throw new Error('Failed to create student');
+        }
+      } else {
+        roleEndpoint = '/api/teachers';
+        const teacherResponse = await fetch(roleEndpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            userId: userID,
+            courses: [] // Initialize with an empty array of courses
+          })
+        });
+
+        if (!teacherResponse.ok) {
+          throw new Error('Failed to create teacher');
+        }
+      }
+
+      console.log(`${selectedRole} created and user updated successfully`);
+      localStorage.setItem('role', selectedRole);
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle error (e.g., show error message to user)
+    }
   };
 
   return (
@@ -36,20 +143,34 @@ export default function Home() {
       <div className="bg-white rounded-lg shadow-xl p-8 max-w-4xl w-full">
         <h1 className="text-4xl font-bold mb-6 text-center text-indigo-600">Welcome to E-Learning Portal</h1>
         
-        {username ? (
+        {user ? (
           <div className="text-center">
-            <p className="text-2xl mb-6">Hello, {username}!</p>
-            <div className="space-x-4">
-              <Link href="/courses" className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded">
-                Explore Courses
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
-              >
-                Logout
-              </button>
-            </div>
+            <p className="text-2xl mb-6">Hello, {user.name}!</p>
+            {!role ? (
+              <div className="space-y-4">
+                <p className="text-lg mb-4">Please select your role:</p>
+                <div className="space-x-4">
+                  <Button onClick={() => handleRoleSelection('student')}>
+                    I'm a Student
+                  </Button>
+                  <Button variant="secondary" onClick={() => handleRoleSelection('teacher')}>
+                    I'm a Teacher
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-x-4">
+                <Link href="/courses" className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded">
+                  Explore Courses
+                </Link>
+                <Button
+                  onClick={handleLogout}
+                  variant="destructive"
+                >
+                  Logout
+                </Button>
+              </div>
+            )}
           </div>
         ) : (
           <>
