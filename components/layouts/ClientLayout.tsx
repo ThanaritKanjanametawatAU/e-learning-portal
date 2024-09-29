@@ -13,6 +13,8 @@ export default function ClientLayout({
 }) {
   const { user, isTeacher } = useAuth();
 
+  console.log('ClientLayout: Auth state', { user, isTeacher });
+
   return (
     <>
       <nav className="bg-gray-800 text-white p-4">

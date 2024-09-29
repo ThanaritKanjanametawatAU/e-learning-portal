@@ -10,8 +10,11 @@ interface Course {
   description: string;
 }
 
-export default function Dashboard() {
+export default function DashboardPage() {
   const { user, isTeacher } = useAuth();
+
+  console.log('DashboardPage: Auth state', { user, isTeacher });
+
   const [courses, setCourses] = useState<Course[]>([]);
 
   useEffect(() => {

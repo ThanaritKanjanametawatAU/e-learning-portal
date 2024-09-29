@@ -1,5 +1,6 @@
 'use client';
 
+import dbConnect from '@/lib/db';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface User {
@@ -25,15 +26,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
+      const parsedUser: User = JSON.parse(storedUser);
       setUser(parsedUser);
-      setIsTeacher(!!parsedUser.teacherId);
+      setIsTeacher(parsedUser.teacherId !== null); // Check for null instead of undefined
     }
   }, []);
 
   const login = (userData: User) => {
     setUser(userData);
-    setIsTeacher(!!userData.teacherId);
+    setIsTeacher(userData.teacherId !== null); // Check for null instead of undefined
     localStorage.setItem('user', JSON.stringify(userData));
   };
 
