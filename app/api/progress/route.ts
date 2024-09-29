@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import { Student } from '@/models';
 
+interface EnrolledCourse {
+  courseId: { toString: () => string };
+  progress: number;
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const studentId = searchParams.get('studentId');
@@ -15,7 +20,7 @@ export async function GET(request: Request) {
   }
 
   const courseProgress = student.enrolledCourses.find(
-    course => course.courseId.toString() === courseId
+    (course: EnrolledCourse) => course.courseId.toString() === courseId
   );
 
   if (!courseProgress) {
@@ -36,7 +41,7 @@ export async function PUT(request: Request) {
   }
 
   const courseIndex = student.enrolledCourses.findIndex(
-    course => course.courseId.toString() === courseId
+    (course: EnrolledCourse) => course.courseId.toString() === courseId
   );
 
   if (courseIndex === -1) {
