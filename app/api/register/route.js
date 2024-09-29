@@ -4,6 +4,7 @@ import dbConnect from '@/lib/db';
 import User from '@/models/User';
 import { ObjectId } from 'mongodb';
 
+
 export async function POST(req) {
   try {
     const { name, email, password, role } = await req.json();
